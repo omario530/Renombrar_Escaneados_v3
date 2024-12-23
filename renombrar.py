@@ -250,7 +250,7 @@ def abrir_pdf():
 
 escaneados()
 cuenta()
-#abrir_pdf()
+abrir_pdf()
 
 # Ejecutar formulario
 ano_texto(datetime.now().year)
