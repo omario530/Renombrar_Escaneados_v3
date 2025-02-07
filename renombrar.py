@@ -131,9 +131,9 @@ def callback(url):
     webbrowser.open_new(url)
 
 
-# Parametros del formulario
+# Parametros del formulario ----------------------------------------------------
 root = tk.Tk()
-root.geometry('450x350')
+root.geometry('600x400')
 root.title('Renombrar Oficios Escaneados')
 
 frm = ttk.Frame(root, padding=10)
@@ -149,16 +149,15 @@ var.trace_add("write", lambda name, index,mode, var=var: oficio_capturado(var))
 
 
 # Conteo
-#Conteo = ttk.Entry(frm, width=20, state=tk.DISABLED, font=('Helvetica', 12))
-Conteo = ttk.Label(frm, width=20, font=('Helvetica', 12))
+Conteo = ttk.Label(frm, width=30, font=('Helvetica', 12))
 Conteo.grid(column=1, row=0, sticky = tk.W)
 # Separador
-ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=1, sticky=tk.W)
+ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=1, row=1, sticky=tk.W)
 
 
 # Archivo actual
 ttk.Label(frm, text="Archivo actual:", font=('Helvetica', 12)).grid(column=0, row=2, sticky=tk.W)
-Archivo_actual = ttk.Label(frm, width=20, font=('Helvetica', 12))
+Archivo_actual = ttk.Label(frm, width=50, font=('Helvetica', 12))
 Archivo_actual.grid(column=1, row=2, sticky = tk.W+tk.E, columnspan=3)
 # Separador
 ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=3, sticky=tk.W)
@@ -244,8 +243,6 @@ def abrir_pdf():
 
         # Abrir el PDF
         webbrowser.open_new(archivo_abrir)
-
-
 
 
 escaneados()
