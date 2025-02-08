@@ -6,6 +6,7 @@ from datetime import datetime
 import webbrowser
 import PyPDF2
 import shutil
+import subprocess
 
 
 # Rutas de carpeta
@@ -23,8 +24,10 @@ ini_pdf = ""
 year = 0
 totalPages = 0
 
+
+# Extraer los nombres de los archivos
 def escaneados():
-    # Extraer los nombres de los archivos
+    
     result_generator = os.walk(entregados)
     files_result = [x for x in result_generator]
 
@@ -35,7 +38,6 @@ def escaneados():
 
     global Actual
     Actual = 1
-
 
 # Funcion para el valor seleccionado en el combobox
 def on_select(event):
@@ -64,7 +66,6 @@ def on_select(event):
 
     Inicio.set(ini_pdf)
 
-
 def oficio_capturado(var):
     global content
     content= var.get()
@@ -73,6 +74,7 @@ def oficio_capturado(var):
 def ano_ingresado(ano_1):
     global year
     captura= ano_1.get()
+    year = captura
     Inicio.set(ini_pdf + str(content) + "_" + str(captura) + ".pdf")
 
 def renombrar():
@@ -87,12 +89,9 @@ def renombrar():
         # Obtener los nombres de cada archivo
         Renombrado.extend([os.path.join(file) for file in file_list])
 
-    # verificar si se alcanzo el total de archivos
-    if Actual > len(Archivo):
-        var.set("Acabamos")
+
         leyenda = str(len(Archivo)) + " de " + str(len(Archivo))
         Conteo.config(text=leyenda)
-    else:
         # llamar al pdf actual
         n = Actual
         anterior = os.path.join(entregados, Archivo[n-1])
@@ -130,10 +129,18 @@ def renombrar():
 def callback(url):
     webbrowser.open_new(url)
 
+# abrir carpeta escaneados
+def carpeta_escaneados():
+    subprocess.run(['xdg-open', entregados])
+
+# abrir carpeta renombrados
+def carpeta_renombrados():
+    subprocess.run(['xdg-open', copiados])
+
 
 # Parametros del formulario ----------------------------------------------------
 root = tk.Tk()
-root.geometry('600x400')
+root.geometry('655x370')
 root.title('Renombrar Oficios Escaneados')
 
 frm = ttk.Frame(root, padding=10)
@@ -150,20 +157,27 @@ var.trace_add("write", lambda name, index,mode, var=var: oficio_capturado(var))
 
 # Conteo
 Conteo = ttk.Label(frm, width=30, font=('Helvetica', 12))
-Conteo.grid(column=1, row=0, sticky = tk.W)
+Conteo.grid(column=0, row=0, sticky = tk.W)
 # Separador
 ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=1, row=1, sticky=tk.W)
 
 
 # Archivo actual
-ttk.Label(frm, text="Archivo actual:", font=('Helvetica', 12)).grid(column=0, row=2, sticky=tk.W)
+ttk.Label(frm, text="Archivo actual:", font=('Helvetica', 10, 'underline')).grid(column=0, row=2, sticky=tk.W)
+
+paginas = ttk.Label(frm, width=30, font=('Helvetica', 12))
+paginas.grid(column=1, row=2, sticky=tk.W)
+paginas.config(foreground ='green')
+
 Archivo_actual = ttk.Label(frm, width=50, font=('Helvetica', 12))
-Archivo_actual.grid(column=1, row=2, sticky = tk.W+tk.E, columnspan=3)
+Archivo_actual.grid(column=0, row=3, sticky = tk.W+tk.E, columnspan=3)
+Archivo_actual.config(foreground ='red')
+
 # Separador
-ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=3, sticky=tk.W)
+#ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=3, sticky=tk.W)
 ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=4, sticky=tk.W)
 
-ttk.Label(frm, text="Generar nombre a partir de DG, Folio y Año", font=('Helvetica', 12, 'underline')).grid(column=0, row=5, sticky = tk.W+tk.E, columnspan=3)
+ttk.Label(frm, text="Generar nombre a partir de DG, Folio y Año", font=('Helvetica', 10, 'underline')).grid(column=0, row=5, sticky = tk.W+tk.E, columnspan=3)
 
 
 # Inicio del oficio
@@ -192,7 +206,7 @@ ttk.Label(frm, text="                                        ", font=('Helvetica
 
 
 # Nuevo nombre
-ttk.Label(frm, text="Nuevo nombre:", font=('Helvetica', 12)).grid(column=0, row=10, sticky=tk.W)
+ttk.Label(frm, text="Nuevo nombre:", font=('Helvetica', 10, 'underline')).grid(column=0, row=10, sticky=tk.W)
 Nuevo_Nombre = ttk.Entry(frm, font=('Helvetica', 12), textvariable = Inicio)
 Nuevo_Nombre.grid(column=0, row=11, sticky = tk.W+tk.E, columnspan=3)
 # Separador
@@ -205,6 +219,14 @@ ttk.Button(frm, text="Renombrar", command=renombrar).grid(column=0, row=13)
 
 # Salir
 ttk.Button(frm, text="Salir", command=root.destroy).grid(column=2, row=13)
+
+
+# carpeta_escaneados
+ttk.Button(frm, text="escaneados", command=carpeta_escaneados).grid(column=1, row=0)
+
+# carpeta_renombrados
+ttk.Button(frm, text="renombrados", command=carpeta_renombrados).grid(column=2, row=0)
+
 
 
 # Credito
@@ -229,7 +251,21 @@ def cuenta():
 
 def abrir_pdf():
     n = Actual
-    if n-1 < len(Archivo):
+
+    #contenido de la carpeta
+    contents = os.listdir(entregados)
+
+    if len(contents) == 0:
+        Archivo_actual.config(text="Sin archivos a renombrar")
+
+
+    # verificar si se alcanzo el total de archivos
+    elif Actual > len(Archivo):
+        Archivo_actual.config(text="Acabamos")
+        leyenda = str(len(Archivo)) + " de " + str(len(Archivo))
+        Conteo.config(text=leyenda)
+
+    elif n-1 < len(Archivo):
         archivo_abrir = os.path.join(entregados, Archivo[n-1])
 
         # Contar las paginas
@@ -238,9 +274,10 @@ def abrir_pdf():
         global totalPages
         totalPages = len(pdfReader.pages)
 
-        leyenda = str(Archivo[n-1]) + "   páginas: " + str(totalPages)
+        leyenda = str(Archivo[n-1])
         Archivo_actual.config(text=leyenda)
-
+        
+        paginas.config(text="págs: " + str(totalPages))
         # Abrir el PDF
         webbrowser.open_new(archivo_abrir)
 
