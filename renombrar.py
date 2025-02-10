@@ -10,6 +10,8 @@ import subprocess
 
 
 # Rutas de carpeta
+ruta_actual = os.getcwd()
+
 entregados = r'escaneados'
 copiados = r'renombrados'
 
@@ -131,12 +133,15 @@ def callback(url):
 
 # abrir carpeta escaneados
 def carpeta_escaneados():
-    subprocess.run(['xdg-open', entregados])
+    #para Ubuntu
+    #subprocess.run(['xdg-open', entregados])
+    os.startfile(entregados)
 
 # abrir carpeta renombrados
 def carpeta_renombrados():
-    subprocess.run(['xdg-open', copiados])
-
+    #para Ubuntu
+    #subprocess.run(['xdg-open', copiados])
+    os.startfile(copiados)
 
 # Parametros del formulario ----------------------------------------------------
 root = tk.Tk()
