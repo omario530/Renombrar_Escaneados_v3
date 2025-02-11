@@ -229,11 +229,11 @@ ttk.Label(frm, text="Archivo actual:", font=('Helvetica', 10, 'underline')).grid
 
 paginas = ttk.Label(frm, width=30, font=('Helvetica', 12))
 paginas.grid(column=1, row=2, sticky=tk.W)
-paginas.config(foreground ='green')
+paginas.config(foreground ='red')
 
 Archivo_actual = ttk.Label(frm, width=50, font=('Helvetica', 12))
 Archivo_actual.grid(column=0, row=3, sticky = tk.W+tk.E, columnspan=3)
-Archivo_actual.config(foreground ='red')
+Archivo_actual.config(foreground ='green')
 
 # Separador
 #ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=3, sticky=tk.W)
