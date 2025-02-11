@@ -97,7 +97,9 @@ def renombrar():
         # llamar al pdf actual
         n = Actual
         anterior = os.path.join(entregados, Archivo[n-1])
-        nuevo_1 = os.path.join(copiados, Nuevo_Nombre.get())
+
+        n_nombre = Nuevo_Nombre.get()
+        nuevo_1 = os.path.join(copiados, n_nombre)
 
         # verificar si el nuevo nombre contiene .pdf
         if nuevo_1.find(".pdf") == -1:
@@ -121,8 +123,11 @@ def renombrar():
             cuenta()
             abrir_pdf()
 
-            # limpiar entrada
-            var.set("")
+            # repetir inicio del folio
+            folio_uno = var.get()
+            var.set(folio_uno[0:len(folio_uno)-1])
+            #var.set("")
+            
 
         else:
             var.set("Repetido")
@@ -142,6 +147,58 @@ def carpeta_renombrados():
     #para Ubuntu
     #subprocess.run(['xdg-open', copiados])
     os.startfile(copiados)
+
+def ano_texto(value):
+    ano.delete(0, tk.END)  # Clear any existing value
+    ano.insert(0, value)   # Insert the new value
+    global year
+    year = value
+
+def cuenta():
+    leyenda = str(Actual) + " de " + str(len(Archivo))
+    Conteo.config(text=leyenda)
+    
+def abrir_pdf():
+    n = Actual
+
+    #contenido de la carpeta
+    contents = os.listdir(entregados)
+
+    if len(contents) == 0:
+        Archivo_actual.config(text="Sin archivos a renombrar")
+
+
+    # verificar si se alcanzo el total de archivos
+    elif Actual > len(Archivo):
+        Archivo_actual.config(text="Acabamos")
+        leyenda = str(len(Archivo)) + " de " + str(len(Archivo))
+        Conteo.config(text=leyenda)
+
+    elif n-1 < len(Archivo):
+        archivo_abrir = os.path.join(entregados, Archivo[n-1])
+
+        # Contar las paginas
+        file = open(archivo_abrir, 'rb')
+        pdfReader = PyPDF2.PdfReader(file)
+        global totalPages
+        totalPages = len(pdfReader.pages)
+
+        leyenda = str(Archivo[n-1])
+        Archivo_actual.config(text=leyenda)
+        
+        paginas.config(text="págs: " + str(totalPages))
+        # Abrir el PDF
+        webbrowser.open_new(archivo_abrir)
+
+def actualizar():
+    escaneados()
+    cuenta()
+    abrir_pdf()
+
+    # Ejecutar formulario
+    ano_texto(datetime.now().year)
+
+    root.mainloop()
 
 # Parametros del formulario ----------------------------------------------------
 root = tk.Tk()
@@ -218,21 +275,21 @@ Nuevo_Nombre.grid(column=0, row=11, sticky = tk.W+tk.E, columnspan=3)
 ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=12, sticky=tk.W)
 
 
-# Botones --------------------------------------
+# Botones -------------------------------------------------------
 # Renombrar
-ttk.Button(frm, text="Renombrar", command=renombrar).grid(column=0, row=13)
+ttk.Button(frm, text="Renombrar", command=renombrar).grid(column=0, row=13, sticky = tk.W+tk.E, columnspan=2)
 
 # Salir
 ttk.Button(frm, text="Salir", command=root.destroy).grid(column=2, row=13)
 
-
 # carpeta_escaneados
-ttk.Button(frm, text="escaneados", command=carpeta_escaneados).grid(column=1, row=0)
+ttk.Button(frm, text="Escaneados", command=carpeta_escaneados).grid(column=0, row=0)
+
+# actualizar
+ttk.Button(frm, text="Actualizar", command=actualizar).grid(column=1, row=0)
 
 # carpeta_renombrados
-ttk.Button(frm, text="renombrados", command=carpeta_renombrados).grid(column=2, row=0)
-
-
+ttk.Button(frm, text="Renombrados", command=carpeta_renombrados).grid(column=2, row=0)
 
 # Credito
 ttk.Label(frm, text="                                        ", font=('Helvetica', 12)).grid(column=0, row=14, sticky=tk.W)
@@ -241,50 +298,6 @@ credito = ttk.Label(frm, text="Por Omar Escamilla Gutiérrez para la ASEA", font
 credito.config(foreground ='blue')
 credito.grid(column=0, row=16, sticky = tk.W+tk.E, columnspan=3)
 credito.bind("<Button-1>", lambda e: callback("www.linkedin.com/in/omar-escamilla-gutierrez-b1457396"))
-
-def ano_texto(value):
-    ano.delete(0, tk.END)  # Clear any existing value
-    ano.insert(0, value)   # Insert the new value
-    global year
-    year = value
-
-
-def cuenta():
-    leyenda = str(Actual) + " de " + str(len(Archivo))
-    Conteo.config(text=leyenda)
-    
-
-def abrir_pdf():
-    n = Actual
-
-    #contenido de la carpeta
-    contents = os.listdir(entregados)
-
-    if len(contents) == 0:
-        Archivo_actual.config(text="Sin archivos a renombrar")
-
-
-    # verificar si se alcanzo el total de archivos
-    elif Actual > len(Archivo):
-        Archivo_actual.config(text="Acabamos")
-        leyenda = str(len(Archivo)) + " de " + str(len(Archivo))
-        Conteo.config(text=leyenda)
-
-    elif n-1 < len(Archivo):
-        archivo_abrir = os.path.join(entregados, Archivo[n-1])
-
-        # Contar las paginas
-        file = open(archivo_abrir, 'rb')
-        pdfReader = PyPDF2.PdfReader(file)
-        global totalPages
-        totalPages = len(pdfReader.pages)
-
-        leyenda = str(Archivo[n-1])
-        Archivo_actual.config(text=leyenda)
-        
-        paginas.config(text="págs: " + str(totalPages))
-        # Abrir el PDF
-        webbrowser.open_new(archivo_abrir)
 
 
 escaneados()
